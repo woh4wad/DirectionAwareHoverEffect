@@ -40,6 +40,11 @@
 			this.support = Modernizr.csstransitions;
 			// load the events
 			this._loadEvents();
+			
+			// Add a no-transition class to body
+			if ( $('#hoverdir-style').length === 0 ) {
+				$('<style id="hoverdir-style">.hoverdir-notransition {-webkit-transition: none !important;-moz-transition: none !important;-o-transition: none !important;-ms-transition: none !important;transition: none !important;}</style>').appendTo( "body" );
+			}
 
 		},
 		_loadEvents : function() {
@@ -55,7 +60,15 @@
 				
 				if( event.type === 'mouseenter' ) {
 					
+					// Disable transtion properly for a moment so firefox could apply the CSS Changes right away
+					// Credit: http://stackoverflow.com/questions/11131875
+					$hoverElem.addClass('hoverdir-notransition'); // Disable transitions
 					$hoverElem.hide().css( styleCSS.from );
+					if ( $hoverElem.length ) {
+						$hoverElem[0].offsetHeight; // Trigger a reflow, flushing the CSS changes
+					}
+					$hoverElem.removeClass('hoverdir-notransition'); // Re-enable transitions
+					
 					clearTimeout( self.tmhover );
 
 					self.tmhover = setTimeout( function() {
